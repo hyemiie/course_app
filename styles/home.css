@@ -1,0 +1,183 @@
+    .containerPage{
+      display: flex;
+      justify-content: space-between;
+  /* background-color: rgb(247, 245, 245); */
+  flex-direction: column;
+
+    }
+    
+    .app-header{
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+  background-color: rgb(255, 255, 255);
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  box-shadow: 0 3px 1px rgb(203, 202, 202, 0.1);
+        font-family:Arial, Helvetica, sans-serif;
+        font-size: 10px;
+
+    }
+
+    .main-content{
+      background-color: rgb(248, 248, 248);
+    }
+
+    .cart-toggle{
+      height: 40px !important;
+      width: 130px !important;
+      background-color: #4eb7c1 !important;
+    }
+    
+    .container {
+      width:30%;
+      margin-right: auto;
+      font-family: Arial, sans-serif;
+
+    }
+
+    .lesson-icon{
+      display: flex;
+      align-items: center;
+      h4{
+        padding: 10px;
+        font-size: 16px;
+      }
+    }
+
+
+    .search-sort-bar{
+      width: 70%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 15px;
+
+      input{
+        width: 300px;
+        padding: 10px;
+        border-radius:08px;
+        outline: none;
+        border: none;
+        background-color: transparent;
+box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      /* background-color: #4eb7c1; */
+      color: white;
+
+
+      }
+
+      .searchDiv{
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        margin-top: 20px;
+        font-family:Arial, Helvetica, sans-serif;
+      }
+    }
+
+    .sort-controls{
+      /* align-items: center;
+      text-align: center; */
+      margin-top: 30px;
+      margin-bottom: 30px;
+      
+    }
+    .sort-select{
+      background-color: rgb(232, 229, 229);
+      padding: 8px;
+      border-radius: 10px;
+      outline: none;
+      border: none;
+      font-family:Georgia, 'Times New Roman', Times, serif;
+      z-index: 100;
+
+    }
+
+    .lessons-section{
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+   
+
+    .filter{
+      width: 20%;
+      position: fixed;
+      z-index: 20;
+      right: 0;
+      padding: 20px;
+    }
+  
+
+    .btnDiv{
+      /* text-align: right; */
+    }
+    .header{
+        text-align: left;
+    }
+
+    .form-control{
+    width: 50%;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid rgb(236, 236, 236);
+    border-radius: 12px;
+    background-color: transparent;
+    margin-bottom: 20px;
+    outline: none;
+box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    }
+
+ .card-div{
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
+        width:70vw;
+    }
+
+    .card {
+      /* border: 1px solid #ccc; */
+      border-radius: 8px;
+      margin-bottom: 10px;
+      padding: 15px;
+      display: flex;
+      align-items: first baseline ;
+      justify-content: center;
+      flex-direction: column;
+      margin-left: 4px;
+      height: 300px;
+      font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+      background-color: rgb(255, 255, 255);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+
+
+    }
+
+   
+    button {
+      background-color: #4eb7c1;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      cursor: pointer;
+      border-radius: 5px;
+      width:100%;
+      /* margin-left: auto; */
+    }
+    button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+
+
+    .img-div{
+      width: 100%;
+      background-size: contain;
+      height: 30%;
+
+    }

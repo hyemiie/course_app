@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./styles/home.css">
+  <title>Lessons App</title>
+  <style>
+   
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="containerPage">
+      <div class="app-header">
+        <div class="header-text"><h1><i class="fas fa-graduation-cap"></i> After School Lessons</h1>
+         
+        </div>
+        
+        <button @click="showCart = !showCart" class="cart-toggle" :disabled="cart.length === 0">
+          <i class="fas fa-shopping-cart"></i> 
+          {{ showCart ? 'View Lessons' : 'View Cart' }}
+          <span v-if="cart.length > 0" class="cart-badge">{{ cart.length }}</span>
+        </button>
+
+        
+
+      </div>
+
+      
+
+      <div v-if="!showCart" class="main-content">
+        <div class="lessons-section">
+          <div class="search-sort-bar">
+          <div class="searchDiv"> 
+                       
+<h2> Classes Catalogue</h2>
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search lessons..."
+              class="search-input"
+            />
+          </div>
+            
+            <div class="sort-controls">
+              <select v-model="sortBy" class="sort-select">
+                <option value="">Sort by...</option>
+                <option value="subject">Subject</option>
+                <option value="location">Location</option>
+                <option value="price">Price</option>
+                <option value="spaces">Availability</option>
+              </select>
+      
+              
+              <select v-model="sortOrder" class="sort-select" :disabled="!sortBy">
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            </div>
+          </div>
+
+          <div v-if="sortedLessons.length" class="card-div">
+            <div v-for="lesson in sortedLessons" :key="lesson.id" class="card">
+                            
+              <img :src=lesson.img_url alt="" class="img-div">
+              <div class="lesson-icon">
+
+
+                <i :class="lesson.icon"></i>               
+                <h4>{{ lesson.subject }}</h4>
+
+              </div>
+              <p><strong><i class="fas fa-map-marker-alt"></i> </strong> {{ lesson.location }}</p>
+              <p><strong><i class="fas fa-dollar-sign"></i> </strong> ${{ lesson.price }}</p>
+              <p><strong><i class="fas fa-users"></i></strong> {{ lesson.spaces }} Availability</p>
+              <button
+                class="btn btn-primary"
+                :disabled="lesson.spaces === 0"
+                @click="addToCart(lesson)"
+              >
+                <i class="fas fa-cart-plus"></i>
+                {{ lesson.spaces === 0 ? 'Sold Out' : 'Add to Cart' }}
+              </button>
+            </div>
+          </div>
+
+          <div v-else class="empty-state">
+            <i class="fas fa-search"></i>
+            <h3>No lessons found</h3>
+            <p>Try adjusting your search</p>
+          </div>
+        </div>
+      </div>
+
+      <div v-else class="main-content">
+        <div class="lessons-section">
+          <h2 style="margin-bottom: 20px; color: #2c3e50;">
+            <i class="fas fa-shopping-cart"></i> Shopping Cart
+          </h2>
+
+          <div v-if="cart.length > 0">
+            <div class="cart-total">
+              <h3>Total: ${{ cartTotal }}</h3>
+              <p>{{ cart.length }} item(s)</p>
+            </div>
+
+            <div class="card-div">
+              <div v-for="(item, index) in cart" :key="index" class="card">
+                <div class="lesson-icon">
+                  <i :class="item.icon"></i>
+                </div>
+                <img :src =item.img_url alt="" class="img-div">
+                <h4>{{ item.subject }}</h4>
+                <p><strong><i class="fas fa-map-marker-alt"></i> Location:</strong> {{ item.location }}</p>
+                <p><strong><i class="fas fa-dollar-sign"></i> Price:</strong> ${{ item.price }}</p>
+                <button class="btn btn-danger" @click="removeFromCart(index)">
+                  <i class="fas fa-trash"></i> Remove
+                </button>
+              </div>
+            </div>
+
+            <div class="checkout-section">
+              <h3><i class="fas fa-credit-card"></i> Checkout</h3>
+              
+              <div class="form-group">
+                <label for="name">Name (letters only)</label>
+                <input
+                  id="name"
+                  v-model="checkoutName"
+                  type="text"
+                  placeholder="Enter your name"
+                  :class="{ invalid: checkoutName && !isNameValid }"
+                />
+                <p v-if="checkoutName && !isNameValid" class="validation-msg">
+                  Name must contain letters only
+                </p>
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Phone (numbers only)</label>
+                <input
+                  id="phone"
+                  v-model="checkoutPhone"
+                  type="text"
+                  placeholder="Enter your phone number"
+                  :class="{ invalid: checkoutPhone && !isPhoneValid }"
+                />
+                <p v-if="checkoutPhone && !isPhoneValid" class="validation-msg">
+                  Phone must contain numbers only
+                </p>
+              </div>
+
+              <button
+                class="btn btn-primary"
+                :disabled="!canCheckout"
+                @click="submitOrder"
+              >
+                <i class="fas fa-check-circle"></i> Complete Order
+              </button>
+
+              <div v-if="orderSubmitted" class="success-message">
+                <i class="fas fa-check-circle" style="font-size: 2em; margin-bottom: 10px;"></i>
+                <h3>Order Submitted Successfully!</h3>
+                <p>Thank you for your purchase, {{ checkoutName }}!</p>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="empty-state">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>Your cart is empty</h3>
+            <p>Add some lessons to get started</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        lessons: [
+          { id: 1, subject: 'Mathematics', location: 'London', price: 100, spaces: 5, icon: 'fas fa-calculator', img_url:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+          { id: 2, subject: 'English', location: 'Oxford', price: 90, spaces: 5, icon: 'fas fa-book', img_url:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+          { id: 3, subject: 'Science', location: 'Cambridge', price: 110, spaces: 5, icon: 'fas fa-flask' , img_url:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+          { id: 4, subject: 'History', location: 'Manchester', price: 85, spaces: 5, icon: 'fas fa-landmark' , img_url:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+          { id: 5, subject: 'Art', location: 'Brighton', price: 95, spaces: 5, icon: 'fas fa-palette' , img_url:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+          { id: 6, subject: 'Music', location: 'Liverpool', price: 105, spaces: 5, icon: 'fas fa-music' , img_url:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+          { id: 7, subject: 'Physical Education', location: 'Leeds', price: 80, spaces: 5, icon: 'fas fa-running', img_url:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+          { id: 8, subject: 'Computer Science', location: 'Bristol', price: 120, spaces: 5, icon: 'fas fa-laptop-code', img_url:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+          { id: 9, subject: 'Geography', location: 'Edinburgh', price: 88, spaces: 5, icon: 'fas fa-globe' , img_url:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+          { id: 10, subject: 'Drama', location: 'Cardiff', price: 92, spaces: 5, icon: 'fas fa-theater-masks' , img_url:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+        ],
+        searchQuery: '',
+        sortBy: '',
+        sortOrder: 'asc',
+        cart: [],
+        showCart: false,
+        checkoutName: '',
+        checkoutPhone: '',
+        orderSubmitted: false
+      },
+      computed: {
+        filteredLessons() {
+          if (!this.searchQuery.trim()) {
+            return this.lessons;
+          }
+          const query = this.searchQuery.toLowerCase();
+          return this.lessons.filter(lesson =>
+            lesson.subject.toLowerCase().includes(query) ||
+            lesson.location.toLowerCase().includes(query) ||
+            String(lesson.price).includes(query) ||
+            String(lesson.spaces).includes(query)
+          );
+        },
+        sortedLessons() {
+          let lessons = [...this.filteredLessons];
+          
+          if (this.sortBy) {
+            lessons.sort((a, b) => {
+              let valA = a[this.sortBy];
+              let valB = b[this.sortBy];
+              
+              if (typeof valA === 'string') {
+                valA = valA.toLowerCase();
+                valB = valB.toLowerCase();
+              }
+              
+              if (this.sortOrder === 'asc') {
+                return valA > valB ? 1 : valA < valB ? -1 : 0;
+              } else {
+                return valA < valB ? 1 : valA > valB ? -1 : 0;
+              }
+            });
+          }
+          
+          return lessons;
+        },
+        isNameValid() {
+          return /^[A-Za-z\s]+$/.test(this.checkoutName);
+        },
+        isPhoneValid() {
+          return /^[0-9]+$/.test(this.checkoutPhone);
+        },
+        canCheckout() {
+          return this.checkoutName && this.checkoutPhone && 
+                 this.isNameValid && this.isPhoneValid;
+        },
+        cartTotal() {
+          return this.cart.reduce((sum, item) => sum + item.price, 0);
+        }
+      },
+      methods: {
+        addToCart(lesson) {
+          if (lesson.spaces > 0) {
+            this.cart.push({...lesson});
+            lesson.spaces--;
+          }
+        },
+        removeFromCart(index) {
+          const item = this.cart[index];
+          const originalLesson = this.lessons.find(l => l.id === item.id);
+          if (originalLesson) {
+            originalLesson.spaces++;
+          }
+          this.cart.splice(index, 1);
+          
+          if (this.cart.length === 0) {
+            this.showCart = false;
+          }
+        },
+        submitOrder() {
+          this.orderSubmitted = true;
+          setTimeout(() => {
+            this.cart = [];
+            this.checkoutName = '';
+            this.checkoutPhone = '';
+            this.orderSubmitted = false;
+            this.showCart = false;
+          }, 3000);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
