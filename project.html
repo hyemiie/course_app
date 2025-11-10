@@ -19,13 +19,14 @@
          
         </div>
         
-        <button @click="showCart = !showCart" class="cart-toggle" :disabled="cart.length === 0">
+      <div> <button @click="showCart = !showCart" class="cart-toggle" :disabled="cart.length === 0">
           <i class="fas fa-shopping-cart"></i> 
           {{ showCart ? 'View Lessons' : 'View Cart' }}
-          <span v-if="cart.length > 0" class="cart-badge">{{ cart.length }}</span>
+          <span v-if="cart.length > 0" class="cart-badge"> {{!showCart ?  cart.length :""}}</span>
         </button>
 
-        
+      
+        </div> 
 
       </div>
 
