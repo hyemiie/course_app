@@ -2,7 +2,7 @@
  new Vue({
   el: '#app',
   data: {
-lessons: [ 
+lessond: [ 
     { id: 1, subject: 'Quantum Mechanics', location: 'Cardiff', price: 92, spaces: 5, icon: 'fas fa-theater-masks' , img_url:"https://plus.unsplash.com/premium_photo-1690297853326-e127726588ac?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjV8fHBoeXNpY3N8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600" }, 
     { id: 2, subject: 'English', location: 'Oxford', price: 90, spaces: 5, icon: 'fas fa-book', img_url:"https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=822" }, 
     { id: 3, subject: 'Science', location: 'Cambridge', price: 110, spaces: 5, icon: 'fas fa-flask' , img_url:"https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" }, 
@@ -14,6 +14,7 @@ lessons: [
         { id: 9, subject: 'Robotics Engineering', location: 'Edinburgh', price: 88, spaces: 5, icon: 'fas fa-globe' , img_url:"https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fHBoeXNpY3N8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600" },
          { id: 10, subject: 'Drama', location: 'London', price: 100, spaces: 5, icon: 'fas fa-calculator', img_url:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
     ],
+    lessons :[],
     searchQuery: '',
     sortBy: '',
     sortOrder: 'asc',
@@ -94,11 +95,12 @@ lessons: [
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      this.lesson = response
       return response.json();
     })
     .then(data => {
-      console.log("Lessons retrieved:", data);
+      this.lessons = data
+      console.log("Lessons retrieved:", this.lessons);
+
     
     })
     .catch(error => {
