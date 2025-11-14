@@ -1,4 +1,5 @@
-new Vue({
+ 
+ new Vue({
   el: '#app',
   data: {
 lessons: [ 
@@ -86,6 +87,27 @@ lessons: [
         this.orderSubmitted = false;
         this.showCart = false;
       }, 3000);
-    }
-  }
+    },
+      retrieveData() {
+  fetch("http://localhost:5000/api/lessons/")
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      this.lesson = response
+      return response.json();
+    })
+    .then(data => {
+      console.log("Lessons retrieved:", data);
+    
+    })
+    .catch(error => {
+      console.error("Error fetching lessons:", error);
+    });
+},
+  },
+  mounted() {
+  this.retrieveData(); 
+}
+
 });
