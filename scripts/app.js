@@ -107,7 +107,31 @@ lessond: [
       console.error("Error fetching lessons:", error);
     });
 },
+
+searchWord() {
+  const word = this.searchQuery.trim();
+
+  fetch(`http://localhost:5000/api/lessons/search/${encodeURIComponent(word)}`, {
+    method: "GET"
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      this.lessons = data.data;
+      console.log("Search response:", data);
+    })
+    .catch(err => {
+      console.error("Search error:", err);
+    });
+}
+
   },
+
+ 
   mounted() {
   this.retrieveData(); 
 }
