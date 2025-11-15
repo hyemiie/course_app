@@ -65,9 +65,29 @@ new Vue({
 
   methods: {
     addToCart(lesson) {
+      console.log(lesson)
       if (lesson.spaces > 0) {
         this.cart.push({ ...lesson });
         lesson.spaces--;
+      console.log("lesson", lesson)
+
+        fetch("http://localhost:5000/api/orders/", {
+          method: "POST", 
+          headers :{"Content-type": "application/json"},
+          body:JSON.stringify(lesson),
+        })
+
+        .then(response =>{
+          if (!response.ok){
+            console.log("response", response)
+            throw new Error(`HTTP error: ${response.status}`);
+          }
+         return response.json()
+
+        })
+        .then(data =>{
+          console.log('data',data)
+        })
       }
     },
 
@@ -124,10 +144,29 @@ new Vue({
         .catch(err => {
           console.error("Search error:", err);
         });
+    },
+    getCartOrder() {
+      const word = this.searchQuery.trim();
+
+      fetch('http://localhost:5000/api/orders/')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          this.cart = data;
+          console.log("Cart response:", data);
+        })
+        .catch(err => {
+          console.error("Search error:", err);
+        });
     }
   },
 
   mounted() {
-    this.retrieveData(); 
+    this.retrieveData();
+    this.getCartOrder(); 
   }
 });
