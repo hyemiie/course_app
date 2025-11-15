@@ -64,40 +64,99 @@ new Vue({
   },
 
   methods: {
-    addToCart(lesson) {
-      console.log(lesson)
-      if (lesson.spaces > 0) {
-        this.cart.push({ ...lesson });
-        lesson.spaces--;
-      console.log("lesson", lesson)
+addToCart(lesson) {
+  if (lesson.spaces > 0) {
 
-        fetch("http://localhost:5000/api/orders/", {
-          method: "POST", 
-          headers :{"Content-type": "application/json"},
-          body:JSON.stringify(lesson),
-        })
+    this.cart.push({ ...lesson });
+    lesson.spaces--;  
+    console.log("lesson after decrement", lesson);
 
-        .then(response =>{
-          if (!response.ok){
-            console.log("response", response)
-            throw new Error(`HTTP error: ${response.status}`);
-          }
-         return response.json()
-
-        })
-        .then(data =>{
-          console.log('data',data)
-        })
+    fetch("http://localhost:5000/api/orders/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(lesson),
+    })
+    .then(response => {
+      if (!response.ok) {
+        console.log("Order create failed:", response);
+        throw new Error(`Order create error: ${response.status}`);
       }
-    },
+      return response.json();
+    })
+    .then(orderResponse => {
+      console.log("Order created:", orderResponse);
 
-    removeFromCart(index) {
-      const item = this.cart[index];
-      const originalLesson = this.lessons.find(l => l.id === item.id);
-      if (originalLesson) originalLesson.spaces++;
-      this.cart.splice(index, 1);
-      if (this.cart.length === 0) this.showCart = false;
-    },
+      return fetch(`http://localhost:5000/api/lessons/${lesson._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ spaces: lesson.spaces }),
+      });
+    })
+    .then(response => {
+      if (!response.ok) {
+        console.log("Lesson update failed:", response);
+        throw new Error(`Lesson update error: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(updatedLesson => {
+      console.log("Lesson updated:", updatedLesson);
+    })
+    .catch(err => {
+      console.error("Error:", err);
+    });
+
+  } else {
+    console.log("No spaces left");
+  }
+},
+removeFromCart(lesson) {
+  console.log("Removing lesson:", lesson);
+
+  const originalLesson = this.lessons.find(l => l.id === lesson.id);
+
+  if (originalLesson) {
+    originalLesson.spaces++;
+  }
+  console.log("Updated original lesson:", originalLesson);
+
+  fetch(`http://localhost:5000/api/orders/${lesson._id}`, {
+    method: "DELETE"
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error while deleting order: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(orderDeleteResponse => {
+    console.log("Order deleted:", orderDeleteResponse);
+    return fetch(`http://localhost:5000/api/lessons/${lesson._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ spaces: originalLesson.spaces })
+    });
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error while updating lesson: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(updatedLesson => {
+    console.log("Lesson updated:", updatedLesson);
+  })
+  .catch(err => {
+    console.error("Error:", err);
+  });
+
+  const index = this.cart.findIndex(item => item.id === lesson.id);
+  if (index !== -1) this.cart.splice(index, 1);
+
+  if (this.cart.length === 0) {
+    this.showCart = false;
+  }
+},
 
     submitOrder() {
       this.orderSubmitted = true;

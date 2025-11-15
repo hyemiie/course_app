@@ -103,7 +103,7 @@
                 <h4>{{ item.subject }}</h4>
                 <p><strong><i class="fas fa-map-marker-alt"></i> Location:</strong> {{ item.location }}</p>
                 <p><strong><i class="fas fa-dollar-sign"></i> Price:</strong> ${{ item.price }}</p>
-                <button class="btn btn-danger" @click="removeFromCart(index)">
+                <button class="btn btn-danger" @click="removeFromCart(item)">
                   <i class="fas fa-trash"></i> Remove
                 </button>
               </div>
