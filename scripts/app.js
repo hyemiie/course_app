@@ -1,19 +1,6 @@
 new Vue({
   el: '#app',
   data: {
-    // lessond: [ 
-    //   { id: 1, subject: 'Quantum Mechanics', location: 'Cardiff', price: 92, spaces: 5, icon: 'fas fa-theater-masks' , img_url:"https://plus.unsplash.com/premium_photo-1690297853326-e127726588ac?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjV8fHBoeXNpY3N8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600" }, 
-    //   { id: 2, subject: 'English', location: 'Oxford', price: 90, spaces: 5, icon: 'fas fa-book', img_url:"https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=822" }, 
-    //   { id: 3, subject: 'Science', location: 'Cambridge', price: 110, spaces: 5, icon: 'fas fa-flask' , img_url:"https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" }, 
-    //   { id: 4, subject: 'History', location: 'Manchester', price: 85, spaces: 5, icon: 'fas fa-landmark' , img_url:"https://images.unsplash.com/photo-1637073849563-5b0ac780ec34?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
-    //   { id: 5, subject: 'Data Science', location: 'Brighton', price: 95, spaces: 5, icon: 'fas fa-palette' , img_url:"https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fHRlY2h8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600" },
-    //   { id: 6, subject: 'Music', location: 'Liverpool', price: 105, spaces: 5, icon: 'fas fa-music' , img_url:"https://images.unsplash.com/photo-1686161238569-f32e92b6c363?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=869" }, 
-    //   { id: 7, subject: 'Cloud Computing', location: 'Leeds', price: 80, spaces: 5, icon: 'fas fa-running', img_url:"https://plus.unsplash.com/premium_photo-1733317290375-d39da9fcc8e3?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1032" },
-    //   { id: 8, subject: 'Computer Science', location: 'Bristol', price: 120, spaces: 5, icon: 'fas fa-laptop-code', img_url:"https://images.unsplash.com/photo-1630324311529-a4027ab19d37?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
-    //   { id: 9, subject: 'Robotics Engineering', location: 'Edinburgh', price: 88, spaces: 5, icon: 'fas fa-globe' , img_url:"https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fHBoeXNpY3N8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600" },
-    //   { id: 10, subject: 'Drama', location: 'London', price: 100, spaces: 5, icon: 'fas fa-calculator', img_url:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
-    // ],
-
     lessons: [],
     searchQuery: '',
     sortBy: '',
@@ -58,58 +45,67 @@ new Vue({
       return this.checkoutName && this.checkoutPhone && this.isNameValid && this.isPhoneValid;
     },
 
+    cartCount() {
+      return this.cart.reduce((sum, item) => sum + (item.count || 1), 0);
+    },
+
     cartTotal() {
       return this.cart.reduce((sum, item) => sum + item.price, 0);
     }
   },
 
   methods: {
-addToCart(lesson) {
-  if (lesson.spaces > 0) {
-
-    this.cart.push({ ...lesson });
-    lesson.spaces--;  
-    console.log("lesson after decrement", lesson);
-
-    fetch("http://localhost:5000/api/orders/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(lesson),
-    })
-    .then(response => {
-      if (!response.ok) {
-        console.log("Order create failed:", response);
-        throw new Error(`Order create error: ${response.status}`);
+    addToCart(lesson) {
+      if (lesson.spaces <= 0) {
+        console.log("No spaces left");
+        return;
       }
-      return response.json();
-    })
-    .then(orderResponse => {
-      console.log("Order created:", orderResponse);
 
-      return fetch(`http://localhost:5000/api/lessons/${lesson._id}`, {
+      const cartItem = this.cart.find(item => item._id === lesson._id);
+
+      if (cartItem) {
+        if (cartItem.count < 5 && lesson.spaces > 0) {
+          cartItem.count += 1;
+          lesson.spaces -= 1;
+        } else {
+          console.log("Cannot add more than available spaces or 5 per order");
+          return;
+        }
+
+        fetch(`http://localhost:5000/api/orders/${lesson._id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ count: cartItem.count }),
+        })
+        .then(res => res.json())
+        .then(updatedOrder => console.log("Order updated:", updatedOrder))
+        .catch(err => console.error("Error updating order:", err));
+
+      } else {
+        const newCartItem = { ...lesson, count: 1 };
+        this.cart.push(newCartItem);
+        lesson.spaces -= 1;
+
+        fetch("http://localhost:5000/api/orders/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newCartItem),
+        })
+        .then(res => res.json())
+        .then(createdOrder => console.log("Order created:", createdOrder))
+        .catch(err => console.error("Error creating order:", err));
+      }
+
+      fetch(`http://localhost:5000/api/lessons/${lesson._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ spaces: lesson.spaces }),
-      });
-    })
-    .then(response => {
-      if (!response.ok) {
-        console.log("Lesson update failed:", response);
-        throw new Error(`Lesson update error: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(updatedLesson => {
-      console.log("Lesson updated:", updatedLesson);
-    })
-    .catch(err => {
-      console.error("Error:", err);
-    });
+      })
+      .then(res => res.json())
+      .then(updatedLesson => console.log("Lesson spaces updated:", updatedLesson))
+      .catch(err => console.error("Error updating lesson:", err));
+    },
 
-  } else {
-    console.log("No spaces left");
-  }
-},
 removeFromCart(lesson) {
   console.log("Removing lesson:", lesson);
 
@@ -120,43 +116,58 @@ removeFromCart(lesson) {
   }
   console.log("Updated original lesson:", originalLesson);
 
-  fetch(`http://localhost:5000/api/orders/${lesson._id}`, {
-    method: "DELETE"
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`HTTP error while deleting order: ${response.status}`);
-    }
-    return response.json();
-  })
-  .then(orderDeleteResponse => {
-    console.log("Order deleted:", orderDeleteResponse);
-    return fetch(`http://localhost:5000/api/lessons/${lesson._id}`, {
+  if (lesson.count > 1) {
+    lesson.count -= 1; 
+
+    fetch(`http://localhost:5000/api/orders/${lesson._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ spaces: originalLesson.spaces })
+      body: JSON.stringify({ count: lesson.count })
+    })
+    .then(res => res.json())
+    .then(updated => console.log("Order count updated:", updated))
+    .catch(err => console.error("Error updating count:", err));
+
+  } else {
+    fetch(`http://localhost:5000/api/orders/${lesson._id}`, {
+      method: "DELETE"
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error while deleting order: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(orderDeleteResponse => {
+      console.log("Order deleted:", orderDeleteResponse);
+      return fetch(`http://localhost:5000/api/lessons/${lesson._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ spaces: originalLesson.spaces })
+      });
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error while updating lesson: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(updatedLesson => {
+      console.log("Lesson updated:", updatedLesson);
+    })
+    .catch(err => {
+      console.error("Error:", err);
     });
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`HTTP error while updating lesson: ${response.status}`);
+
+    const index = this.cart.findIndex(item => item.id === lesson.id);
+    if (index !== -1) this.cart.splice(index, 1);
+
+    if (this.cart.length === 0) {
+      this.showCart = false;
     }
-    return response.json();
-  })
-  .then(updatedLesson => {
-    console.log("Lesson updated:", updatedLesson);
-  })
-  .catch(err => {
-    console.error("Error:", err);
-  });
-
-  const index = this.cart.findIndex(item => item.id === lesson.id);
-  if (index !== -1) this.cart.splice(index, 1);
-
-  if (this.cart.length === 0) {
-    this.showCart = false;
   }
 },
+
 
     submitOrder() {
       this.orderSubmitted = true;
@@ -204,9 +215,8 @@ removeFromCart(lesson) {
           console.error("Search error:", err);
         });
     },
-    getCartOrder() {
-      const word = this.searchQuery.trim();
 
+    getCartOrder() {
       fetch('http://localhost:5000/api/orders/')
         .then(response => {
           if (!response.ok) {
@@ -226,6 +236,6 @@ removeFromCart(lesson) {
 
   mounted() {
     this.retrieveData();
-    this.getCartOrder(); 
+    this.getCartOrder();
   }
 });

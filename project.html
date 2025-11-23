@@ -20,8 +20,8 @@
           <button @click="showCart = !showCart" class="cart-toggle" :disabled="cart.length === 0">
             <i class="fas fa-shopping-cart"></i>
             {{ showCart ? 'View Lessons' : 'View Cart' }}
-            <span v-if="cart.length > 0" class="cart-badge">
-              {{!showCart ?  cart.length :""}}
+            <span v-if="cart.length > 0" class="cart-badge" v-for="cartCount">
+              {{!showCart ?  cartCount :""}}
             </span>
           </button>
         </div>
@@ -67,7 +67,8 @@
               <p><strong><i class="fas fa-map-marker-alt"></i></strong> {{ lesson.location }}</p>
               <p><strong><i class="fas fa-dollar-sign"></i></strong> ${{ lesson.price }}</p>
               <p><strong><i class="fas fa-users"></i></strong> {{ lesson.spaces }} Seats left</p>
-              <button class="btn btn-primary" :disabled="lesson.spaces === 0" @click="addToCart(lesson)">
+              <!-- <input type="number" max="5" min="1" class="space-count" v-model.number ="lesson.count"/> -->
+              <button class="btn btn-primary" :disabled="lesson.spaces === 0" @click="addToCart(lesson, lesson-count)">
                 <i class="fas fa-cart-plus"></i>
                 {{ lesson.spaces === 0 ? 'Class filled' : 'Add to Cart' }}
               </button>
@@ -101,8 +102,11 @@
                 </div>
                 <img :src="item.img_url" alt="" class="img-div" />
                 <h4>{{ item.subject }}</h4>
+
                 <p><strong><i class="fas fa-map-marker-alt"></i> Location:</strong> {{ item.location }}</p>
                 <p><strong><i class="fas fa-dollar-sign"></i> Price:</strong> ${{ item.price }}</p>
+                <p><strong><i class="fas fa-bag"></i> Count:</strong> {{ item.count }}</p>
+
                 <button class="btn btn-danger" @click="removeFromCart(item)">
                   <i class="fas fa-trash"></i> Remove
                 </button>
