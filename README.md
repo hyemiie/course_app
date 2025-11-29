@@ -1,7 +1,6 @@
 # Course_app
 
-This project has two parts: a Vue.js frontend and an Express.js backend.
-Below are the links to the code and the live versions.
+This project has two parts: a Vue.js frontend and an Express.js backend. The links to the code and live versions of the project are listed below
 
 ## Vue.js App
 
