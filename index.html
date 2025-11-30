@@ -68,7 +68,7 @@
               <p><strong><i class="fas fa-dollar-sign"></i></strong> ${{ lesson.price }}</p>
               <p><strong><i class="fas fa-users"></i></strong> {{ lesson.spaces }} Seats left</p>
               <!-- <input type="number" max="5" min="1" class="space-count" v-model.number ="lesson.count"/> -->
-              <button class="btn btn-primary" :disabled="lesson.spaces === 0" @click="addToCart(lesson, lesson-count)">
+              <button class="btn btn-primary" :disabled="lesson.spaces === 0" v-on:click="addToCart(lesson, lesson-count)">
                 <i class="fas fa-cart-plus"></i>
                 {{ lesson.spaces === 0 ? 'Class filled' : 'Add to Cart' }}
               </button>
@@ -105,6 +105,10 @@
 
                 <p><strong><i class="fas fa-map-marker-alt"></i> Location:</strong> {{ item.location }}</p>
                 <p><strong><i class="fas fa-dollar-sign"></i> Price:</strong> ${{ item.price }}</p>
+<p v-if="item.count > 1">
+  <strong><i class="fas fa-dollar-sign"></i> Computed Price:</strong>
+  ${{ item.computed_price }}
+</p>
                 <p><strong><i class="fas fa-bag"></i> Count:</strong> {{ item.count }}</p>
 
                 <button class="btn btn-danger" @click="removeFromCart(item)">
